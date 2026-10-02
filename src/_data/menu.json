@@ -1,1 +1,11 @@
-{"cta_text":"","cta_url":"","show_about":true,"show_archive":true,"show_artists":true,"show_cta":false,"show_instagram":true,"show_privacy":true,"show_upcoming":true}
+{
+  "show_archive": true,
+  "cta_url": "",
+  "show_privacy": true,
+  "show_artists": false,
+  "show_about": true,
+  "show_cta": false,
+  "show_instagram": true,
+  "cta_text": "",
+  "show_upcoming": true
+}
