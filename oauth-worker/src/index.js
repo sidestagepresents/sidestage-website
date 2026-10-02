@@ -55,16 +55,29 @@ export default {
         return new Response("GitHub did not return an access token.", { status: 502 });
       }
 
-      // Decap CMS listens for: authorization:github:success:{"token":"...","provider":"github"}
-      const payload = JSON.stringify({ token, provider: "github" });
+      // Decap CMS 3.x GitHub backend requires a two-step popup handshake:
+      // 1. popup posts 'authorizing:github' to the opener
+      // 2. opener echoes a message back
+      // 3. popup posts 'authorization:github:success:{"token":"...","provider":"github"}'
+      // Posting the success message without the handshake is silently ignored.
+      const payloadJson = JSON.stringify({ token, provider: "github" });
       const html = `<!doctype html>
-<html><head><meta charset="utf-8"><title>Login complete</title></head>
-<body><p>Login complete. You can close this window.</p>
+<html><head><meta charset="utf-8"><title>Completing login</title></head>
+<body><p>Completing login&hellip;</p>
 <script>
 (function () {
-  var message = "authorization:github:success:" + ${JSON.stringify(payload)};
+  var message = "authorization:github:success:" + ${JSON.stringify(payloadJson)};
+  function receiveMessage(e) {
+    window.removeEventListener("message", receiveMessage, false);
+    if (window.opener) {
+      window.opener.postMessage(message, e.origin);
+    }
+  }
   if (window.opener) {
-    window.opener.postMessage(message, "*");
+    window.addEventListener("message", receiveMessage, false);
+    window.opener.postMessage("authorizing:github", "*");
+  } else {
+    document.body.innerHTML = "<p>Login complete. You can close this window.</p>";
   }
 })();
 </script></body></html>`;
