@@ -19,9 +19,18 @@ header {
   flex-wrap: wrap;
   gap: 12px;
 }
-.wordmark { color: #fff; text-decoration: none; font-weight: 800; letter-spacing: 2px; }
+.wordmark { color: #fff; text-decoration: none; font-weight: 800; letter-spacing: 2px; display: inline-flex; align-items: center; }
+.logo { height: 34px; width: auto; display: block; filter: invert(1); }
+nav { display: flex; align-items: center; }
 nav a { color: #aaa; text-decoration: none; margin-left: 18px; }
 nav a:hover { color: #fff; }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border: 1px solid #fff; color: #fff;
+  margin-left: 18px; text-decoration: none;
+}
+.icon-btn:hover { background: #fff; color: #000; }
+.icon-btn svg { display: block; }
 
 main { padding: 32px 0; }
 h1 { font-size: 1.75rem; margin: 0 0 8px; }

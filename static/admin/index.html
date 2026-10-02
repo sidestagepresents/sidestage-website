@@ -7,5 +7,37 @@
 </head>
 <body>
 <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+<script>
+/*
+ * Adds a "View site" link to the Decap CMS top bar (Decap has no built-in one).
+ * Uses the current origin so it keeps working after the production domain cutover.
+ */
+(function () {
+  var LINK_ID = "decap-view-site-link";
+  function inject() {
+    if (document.getElementById(LINK_ID)) return true;
+    var header = document.querySelector("#nc-root header");
+    if (!header) return false;
+    var link = document.createElement("a");
+    link.id = LINK_ID;
+    link.href = new URL("/", window.location.href).href;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = "View site";
+    link.style.cssText =
+      "margin-left:16px;padding:8px 16px;border:1px solid #dfdfe3;border-radius:4px;" +
+      "color:#3a3a3a;background:#fff;text-decoration:none;font-size:14px;font-weight:500;" +
+      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;";
+    header.appendChild(link);
+    return true;
+  }
+  if (!inject()) {
+    var observer = new MutationObserver(function () {
+      if (inject()) observer.disconnect();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+})();
+</script>
 </body>
 </html>

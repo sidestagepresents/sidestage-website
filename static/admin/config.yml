@@ -36,6 +36,8 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     identifier_field: artist
+    summary: "{{artist}} · {{city}} — {{date | date('MMM D, YYYY')}}"
+    sortable_fields: ["date", "city", "artist"]
     fields:
       - { label: "Artist", name: "artist", widget: "string" }
       - { label: "Event title (tour)", name: "title", widget: "string", required: false }
