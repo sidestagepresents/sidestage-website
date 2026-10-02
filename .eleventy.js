@@ -33,29 +33,33 @@ module.exports = function (eleventyConfig) {
     (events || []).filter((e) => (e.data.artist || "") === name)
   );
 
+  // Drafts: excluded from listings and not written as pages
+  const notDraft = (items) => (items || []).filter((i) => !i.data.draft);
+  eleventyConfig.addGlobalData("eleventyComputed", {
+    permalink: (data) => (data.draft ? false : data.permalink),
+  });
+
   const byDateDesc = (a, b) => (isoDate(a.data.date) < isoDate(b.data.date) ? 1 : -1);
 
   eleventyConfig.addCollection("allEvents", (c) =>
-    c.getFilteredByGlob("src/events/*.md").sort(byDateDesc)
+    notDraft(c.getFilteredByGlob("src/events/*.md")).sort(byDateDesc)
   );
   eleventyConfig.addCollection("upcomingEvents", (c) => {
     const t = todayStr();
-    return c
-      .getFilteredByGlob("src/events/*.md")
+    return notDraft(c.getFilteredByGlob("src/events/*.md"))
       .filter((e) => isoDate(e.data.date) >= t)
       .sort(byDateDesc);
   });
   eleventyConfig.addCollection("pastEvents", (c) => {
     const t = todayStr();
-    return c
-      .getFilteredByGlob("src/events/*.md")
+    return notDraft(c.getFilteredByGlob("src/events/*.md"))
       .filter((e) => isoDate(e.data.date) < t)
       .sort(byDateDesc);
   });
   eleventyConfig.addCollection("artistsList", (c) =>
-    c
-      .getFilteredByGlob("src/artists/*.md")
-      .sort((a, b) => (a.data.name || "").localeCompare(b.data.name || ""))
+    notDraft(c.getFilteredByGlob("src/artists/*.md")).sort((a, b) =>
+      (a.data.name || "").localeCompare(b.data.name || "")
+    )
   );
 
   return {

@@ -10,8 +10,10 @@ title: Upcoming Shows
 <p>No upcoming shows announced yet. Check back soon.</p>
 {% endfor %}
 
+{% if settings.instagram_url %}
 <section class="instagram-section">
   <h2>Stay in the loop</h2>
   <p>Show announcements, on-sales, and updates — first on Instagram.</p>
-  <p><a class="btn" href="https://www.instagram.com/sidestagepresents/" target="_blank" rel="noopener">Follow @SidestagePresents</a></p>
+  <p><a class="btn" href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Follow @SidestagePresents</a></p>
 </section>
+{% endif %}
