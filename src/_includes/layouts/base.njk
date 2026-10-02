@@ -27,6 +27,8 @@
 <div class="wrap">
 <header>
   <a class="wordmark" href="/" aria-label="{{ settings.site_name }} — home"><img class="logo" src="/img/logo.png" alt="{{ settings.site_name }}"></a>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" tabindex="-1" aria-hidden="true">
+  <label for="nav-toggle" class="nav-burger" aria-label="Menu"><span></span><span></span><span></span></label>
   <nav>
     {% if menu.show_upcoming != false %}<a href="/">Upcoming</a>{% endif %}
     {% if menu.show_archive != false %}<a href="/archive/">Archive</a>{% endif %}
