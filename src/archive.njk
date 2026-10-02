@@ -1,0 +1,17 @@
+---
+layout: layouts/base.njk
+title: Past Shows
+---
+<h1>Past Shows</h1>
+{% import "event-card.njk" as cards %}
+{% set currentYear = "" %}
+{% for e in collections.pastEvents %}
+{% set y = e.data.date | year %}
+{% if y != currentYear %}
+{% set currentYear = y %}
+<h2 class="year">{{ y }}</h2>
+{% endif %}
+{{ cards.card(e) }}
+{% else %}
+<p>No past shows yet.</p>
+{% endfor %}

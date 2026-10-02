@@ -1,0 +1,24 @@
+---
+layout: layouts/base.njk
+---
+<article class="artist">
+  {% if image %}<img class="artist-photo" src="{{ image }}" alt="{{ name }}">{% endif %}
+  <h1>{{ name }}</h1>
+  <p class="socials">
+    {% if socials.instagram %}<a href="{{ socials.instagram }}">Instagram</a>{% endif %}
+    {% if socials.x %}<a href="{{ socials.x }}">X</a>{% endif %}
+    {% if socials.tiktok %}<a href="{{ socials.tiktok }}">TikTok</a>{% endif %}
+    {% if socials.spotify %}<a href="{{ socials.spotify }}">Spotify</a>{% endif %}
+    {% if socials.youtube %}<a href="{{ socials.youtube }}">YouTube</a>{% endif %}
+    {% if socials.website %}<a href="{{ socials.website }}">Website</a>{% endif %}
+  </p>
+  <div class="bio">{{ content | safe }}</div>
+  <h2>Shows</h2>
+  {% import "event-card.njk" as cards %}
+  {% set shows = collections.allEvents | byArtist(name) %}
+  {% for e in shows %}
+  {{ cards.card(e) }}
+  {% else %}
+  <p>No shows listed yet.</p>
+  {% endfor %}
+</article>

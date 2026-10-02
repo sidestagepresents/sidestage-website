@@ -1,0 +1,17 @@
+---
+layout: layouts/base.njk
+title: Upcoming Shows
+---
+<h1>Upcoming Shows</h1>
+{% import "event-card.njk" as cards %}
+{% for e in collections.upcomingEvents %}
+{{ cards.card(e) }}
+{% else %}
+<p>No upcoming shows announced yet. Check back soon.</p>
+{% endfor %}
+
+<section class="instagram-section">
+  <h2>Stay in the loop</h2>
+  <p>Show announcements, on-sales, and updates — first on Instagram.</p>
+  <p><a class="btn" href="https://www.instagram.com/sidestagepresents/" target="_blank" rel="noopener">Follow @SidestagePresents</a></p>
+</section>

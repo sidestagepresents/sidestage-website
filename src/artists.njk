@@ -1,0 +1,15 @@
+---
+layout: layouts/base.njk
+title: Artists
+---
+<h1>Artists</h1>
+<div class="artist-grid">
+{% for a in collections.artistsList %}
+<a class="artist-card" href="/artists/{{ a.page.fileSlug }}/">
+  {% if a.data.image %}<img src="{{ a.data.image }}" alt="{{ a.data.name }}">{% endif %}
+  <span>{{ a.data.name }}</span>
+</a>
+{% else %}
+<p>No artists listed yet.</p>
+{% endfor %}
+</div>
