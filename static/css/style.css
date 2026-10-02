@@ -20,7 +20,7 @@ header {
   gap: 12px;
 }
 .wordmark { color: #fff; text-decoration: none; font-weight: 800; letter-spacing: 2px; display: inline-flex; align-items: center; }
-.logo { height: 40px; width: auto; display: block; }
+.logo { height: 54px; width: auto; display: block; }
 nav { display: flex; align-items: center; }
 nav a { color: #aaa; text-decoration: none; margin-left: 18px; }
 nav a:hover { color: #fff; }
