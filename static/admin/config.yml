@@ -48,6 +48,11 @@ collections:
         name: "date"
         widget: "datetime"
         format: "YYYY-MM-DD"
+      - label: "Publish at"
+        name: "publish_at"
+        widget: "datetime"
+        required: false
+        hint: "Optional: keep this event hidden until this date/time (Toronto time). Goes live automatically."
       - { label: "Flyer image", name: "image", widget: "image", required: false }
       - { label: "Ticket link", name: "ticket_link", widget: "string", required: false }
       - { label: "Sold out", name: "sold_out", widget: "boolean", default: false }

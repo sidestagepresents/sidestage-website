@@ -33,8 +33,39 @@ module.exports = function (eleventyConfig) {
     (events || []).filter((e) => (e.data.artist || "") === name)
   );
 
-  // Drafts: excluded from listings and not written as pages
-  const notDraft = (items) => (items || []).filter((i) => !i.data.draft);
+  // Drafts: excluded from listings and not written as pages.
+  // publish_at: event stays hidden until that moment (Toronto wall time if
+  // no offset given); unparseable embargo values stay hidden (fail closed).
+  const nthSundayUTC = (y, m, n) => {
+    const first = 1 + ((7 - new Date(Date.UTC(y, m, 1)).getUTCDay()) % 7);
+    return new Date(Date.UTC(y, m, first + 7 * (n - 1)));
+  };
+  const torontoOffsetMinutes = (d) => {
+    const y = d.getUTCFullYear();
+    const start = nthSundayUTC(y, 2, 2); start.setUTCHours(7); // 2nd Sun Mar, 2am local
+    const end = nthSundayUTC(y, 10, 1); end.setUTCHours(6);   // 1st Sun Nov, 2am local
+    return d >= start && d < end ? -240 : -300;
+  };
+  const publishTime = (v) => {
+    if (!v) return null;
+    if (v instanceof Date) return isNaN(v) ? null : v;
+    const s = String(v).trim();
+    if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(s)) {
+      const t = new Date(s);
+      return isNaN(t) ? null : t;
+    }
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+    if (!m) return null;
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0)));
+    return new Date(d.getTime() - torontoOffsetMinutes(d) * 60000);
+  };
+  const isLive = (e) => {
+    if (e.data.draft) return false;
+    if (!e.data.publish_at) return true;
+    const t = publishTime(e.data.publish_at);
+    return !!t && t <= new Date();
+  };
+  const notDraft = (items) => (items || []).filter(isLive);
   eleventyConfig.addGlobalData("eleventyComputed", {
     permalink: (data) => (data.draft ? false : data.permalink),
   });

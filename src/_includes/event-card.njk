@@ -7,8 +7,8 @@
     <h2>{{ e.data.artist }}{% if e.data.title %}<span class="event-title"> — {{ e.data.title }}</span>{% endif %}</h2>
     <p class="meta">{{ e.data.date | readableDate }} · {{ e.data.venue }}, {{ e.data.city }}</p>
     <p class="actions">
-      {% if e.data.sold_out %}<span class="badge">SOLD OUT</span>{% endif %}
-      {% if e.data.ticket_link %}<a class="btn" href="{{ e.data.ticket_link }}" target="_blank" rel="noopener">Tickets</a>{% endif %}
+      {% if e.data.sold_out %}<span class="badge">SOLD OUT</span>
+      {% elif e.data.ticket_link %}<a class="btn" href="{{ e.data.ticket_link }}" target="_blank" rel="noopener">Tickets</a>{% endif %}
     </p>
   </div>
 </article>
