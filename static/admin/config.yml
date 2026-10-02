@@ -67,7 +67,6 @@ collections:
           - { label: "Title", name: "title", widget: "string" }
           - { label: "Body", name: "body", widget: "markdown" }
           - { label: "Draft", name: "draft", widget: "boolean", default: false, required: false, hint: "Hide this page from the site" }
-          - { label: "Show in menu", name: "show_in_nav", widget: "boolean", default: true, required: false }
   - name: "settings"
     label: "Site Settings"
     files:
@@ -85,3 +84,16 @@ collections:
           - { label: "SEO title", name: "seo_title", widget: "string", hint: "Homepage title shown in Google and when sharing" }
           - { label: "Meta description", name: "seo_description", widget: "text", hint: "Short description shown in Google and when sharing" }
           - { label: "Default share image", name: "og_image", widget: "image", required: false, hint: "Image shown when sharing the homepage (event pages use their flyer)" }
+      - label: "Menu"
+        name: "menu"
+        file: "src/_data/menu.json"
+        fields:
+          - { label: "Upcoming", name: "show_upcoming", widget: "boolean", default: true }
+          - { label: "Archive", name: "show_archive", widget: "boolean", default: true }
+          - { label: "Artists", name: "show_artists", widget: "boolean", default: true }
+          - { label: "About", name: "show_about", widget: "boolean", default: true }
+          - { label: "Privacy", name: "show_privacy", widget: "boolean", default: true }
+          - { label: "Instagram button", name: "show_instagram", widget: "boolean", default: true, hint: "Shows the Instagram icon in the menu (uses the Instagram URL from General settings)" }
+          - { label: "CTA button", name: "show_cta", widget: "boolean", default: false, hint: "Shows a call-to-action button in the menu" }
+          - { label: "CTA text", name: "cta_text", widget: "string", required: false, hint: "e.g. Get Tickets" }
+          - { label: "CTA link", name: "cta_url", widget: "string", required: false }
