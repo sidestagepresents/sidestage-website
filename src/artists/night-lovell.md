@@ -1,5 +1,6 @@
 ---
 name: Night Lovell
+image: /img/night_lovell_photo.jpg
 socials:
   instagram: https://www.instagram.com/nightlovell/
   x: https://twitter.com/nightlovell
