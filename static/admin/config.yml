@@ -53,6 +53,11 @@ collections:
         widget: "datetime"
         required: false
         hint: "Optional: keep this event hidden until this date/time (Toronto time). Goes live automatically."
+      - label: "On sale at"
+        name: "onsale_at"
+        widget: "datetime"
+        required: false
+        hint: "Optional: auto-post 'on sale now' to socials at this time (Toronto time). Needs the Buffer connection."
       - { label: "Flyer image", name: "image", widget: "image", required: false }
       - { label: "Ticket link", name: "ticket_link", widget: "string", required: false }
       - { label: "Sold out", name: "sold_out", widget: "boolean", default: false }
