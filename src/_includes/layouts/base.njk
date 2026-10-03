@@ -19,6 +19,7 @@
 <meta name="twitter:description" content="{{ pageDesc }}">
 {% if shareImage %}<meta name="twitter:image" content="{{ settings.site_url }}{{ shareImage }}">{% endif %}
 <link rel="stylesheet" href="/css/style.css?v=2">
+<link rel="icon" href="/favicon.ico">
 </head>
 <body>
 {% set aboutPage = collections.all | selectattr("fileSlug", "equalto", "about") | first %}

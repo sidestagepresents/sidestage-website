@@ -73,6 +73,20 @@ module.exports = function (eleventyConfig) {
   const byDateDesc = (a, b) => (isoDate(a.data.date) < isoDate(b.data.date) ? 1 : -1);
   const byDateAsc = (a, b) => (isoDate(a.data.date) < isoDate(b.data.date) ? -1 : 1);
 
+  // Append default UTM tags to outbound ticket links (skips params already set)
+  const addUtm = (url) => {
+    if (!url) return url;
+    try {
+      const u = new URL(url);
+      if (!u.searchParams.has("utm_source")) u.searchParams.set("utm_source", "sidestagepresents.com");
+      if (!u.searchParams.has("utm_medium")) u.searchParams.set("utm_medium", "referral");
+      return u.toString();
+    } catch {
+      return url;
+    }
+  };
+  eleventyConfig.addFilter("utm", addUtm);
+
   eleventyConfig.addCollection("allEvents", (c) =>
     notDraft(c.getFilteredByGlob("src/events/*.md")).sort(byDateDesc)
   );
