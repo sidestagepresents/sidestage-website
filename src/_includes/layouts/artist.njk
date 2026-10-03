@@ -2,7 +2,7 @@
 layout: layouts/base.njk
 ---
 <article class="artist">
-  {% if image %}<img class="artist-photo" src="{{ image }}" alt="{{ name }}">{% endif %}
+  {% if image %}<div class="artist-photo">{% eventImage image, name %}</div>{% endif %}
   <h1>{{ name }}</h1>
   <p class="socials">
     {% if socials.instagram %}<a href="{{ socials.instagram }}">Instagram</a>{% endif %}

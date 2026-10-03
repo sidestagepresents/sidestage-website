@@ -92,6 +92,67 @@ module.exports = function (eleventyConfig) {
   };
   eleventyConfig.addFilter("utm", addUtm);
 
+  // Responsive, optimized event images: upload anything, the build serves WebP.
+  // Transforms run once in eleventy.before (async); the shortcode itself stays
+  // sync so it works inside Nunjucks macros. Only event/artist images are
+  // transformed — the logo and favicon are served byte-identical.
+  const path = require("path");
+  const fs = require("fs");
+  const imageHtmlCache = new Map();
+  eleventyConfig.on("eleventy.before", async () => {
+    const { default: Image } = await import("@11ty/eleventy-img");
+    const seen = new Set();
+    const readFrontMatter = (file) => {
+      const text = fs.readFileSync(file, "utf8");
+      const m = text.match(/^---\n([\s\S]*?)\n---/);
+      if (!m) return {};
+      const data = {};
+      for (const line of m[1].split("\n")) {
+        const kv = line.match(/^([A-Za-z_]+):\s*(.*)$/);
+        if (kv) data[kv[1]] = kv[2].trim().replace(/^['"]|['"]$/g, "");
+      }
+      return data;
+    };
+    for (const dir of ["./src/events", "./src/artists"]) {
+      if (!fs.existsSync(dir)) continue;
+      for (const f of fs.readdirSync(dir)) {
+        if (!f.endsWith(".md")) continue;
+        const data = readFrontMatter(`${dir}/${f}`);
+        const src = data.image;
+        if (!src || seen.has(src)) continue;
+        seen.add(src);
+        const alt = data.artist ? `${data.artist} flyer` : data.name || "";
+        try {
+          const metadata = await Image("./src" + src, {
+            widths: [400, 800],
+            formats: ["webp", "jpeg"],
+            outputDir: "./_site/img/",
+            urlPath: "/img/",
+            filenameFormat: (id, srcPath, width, format) =>
+              `${path.parse(srcPath).name}-${width}w.${format}`,
+          });
+          imageHtmlCache.set(
+            src,
+            Image.generateHTML(metadata, {
+              alt,
+              loading: "lazy",
+              decoding: "async",
+              sizes: "(max-width: 600px) 100vw, 200px",
+            })
+          );
+        } catch {
+          /* fall back to the plain img tag below */
+        }
+      }
+    }
+  });
+  eleventyConfig.addNunjucksShortcode("eventImage", (src, alt) => {
+    return (
+      imageHtmlCache.get(src) ||
+      `<img src="${src}" alt="${alt || ""}" loading="lazy">`
+    );
+  });
+
   eleventyConfig.addCollection("allEvents", (c) =>
     notDraft(c.getFilteredByGlob("src/events/*.md")).sort(byDateDesc)
   );

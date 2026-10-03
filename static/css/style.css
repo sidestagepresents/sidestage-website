@@ -139,7 +139,8 @@ nav .btn { margin-left: 18px; }
 .artist-card { text-decoration: none; border: 1px solid #222; padding: 12px; display: block; }
 .artist-card:hover { border-color: #666; }
 .artist-card img { width: 100%; height: auto; display: block; background: #111; margin-bottom: 8px; }
-.artist-photo { max-width: 320px; width: 100%; height: auto; display: block; background: #111; margin-bottom: 16px; }
+.artist-photo { max-width: 320px; margin-bottom: 16px; }
+.artist-photo img, .artist-photo picture { width: 100%; height: auto; display: block; background: #111; }
 .socials a { margin-right: 14px; color: #aaa; }
 .socials a:hover { color: #fff; }
 .bio { margin: 16px 0 32px; max-width: 65ch; }

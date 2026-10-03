@@ -1,7 +1,7 @@
 {% macro card(e) %}
 <article class="event{% if not e.data.image %} no-img{% endif %}">
   {% if e.data.image %}
-  <div class="event-img"><img src="{{ e.data.image }}" alt="{{ e.data.artist }} flyer" loading="lazy"></div>
+  <div class="event-img">{% eventImage e.data.image, e.data.artist + " flyer" %}</div>
   {% endif %}
   <div class="event-body">
     <h2>{{ e.data.artist }}{% if e.data.title %}<span class="event-title"> — {{ e.data.title }}</span>{% endif %}</h2>
