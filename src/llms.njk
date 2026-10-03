@@ -1,0 +1,44 @@
+---
+permalink: /llms.txt
+---
+# {{ settings.site_name }}
+
+> {{ settings.seo_description | safe }}
+
+Website: {{ settings.site_url }}
+
+## Upcoming shows
+{% for e in collections.upcomingEvents -%}
+- {{ e.data.date | readableDate }} — {{ e.data.artist }}{% if e.data.title %}: {{ e.data.title }}{% endif %}, {{ e.data.city }} ({{ e.data.venue }}){% if e.data.sold_out %} [SOLD OUT]{% endif %}{% if e.data.ticket_link %} — tickets: {{ e.data.ticket_link }}{% endif %}
+{% endfor %}
+{% if not collections.upcomingEvents.length %}No shows currently announced — check back soon.{% endif %}
+## Past shows
+
+Full archive of past shows: {{ settings.site_url }}/archive/
+
+## Artists
+
+{% for a in collections.artistsList -%}
+- {{ a.data.name }} — {{ settings.site_url }}/artists/{{ a.page.fileSlug }}/
+{% endfor %}
+## About
+
+{{ settings.site_url }}/about/
+
+## Follow
+
+{% if settings.instagram_url -%}
+- Instagram: {{ settings.instagram_url }}
+{% endif -%}
+{% if settings.facebook_url -%}
+- Facebook: {{ settings.facebook_url }}
+{% endif -%}
+{% if settings.x_url -%}
+- X: {{ settings.x_url }}
+{% endif -%}
+{% if settings.tiktok_url -%}
+- TikTok: {{ settings.tiktok_url }}
+{% endif -%}
+{% if settings.youtube_url -%}
+- YouTube: {{ settings.youtube_url }}
+{% endif -%}
