@@ -6,7 +6,7 @@ venue: Fortune Sound Club
 date: 2026-10-02
 image: /img/kybba-oct-2.png
 ticket_link: https://kybba.world
-sold_out: false
+sold_out: true
 ---
 
 <!-- note: Earlier IG announcement (Jun 2) listed Vancouver venue as "The Key"; Sep 10 posts say Fortune Sound Club. Filed as Fortune Sound Club. -->
