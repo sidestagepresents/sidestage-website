@@ -1,10 +1,11 @@
 ---
-artist: "Kybba"
+artist: Kybba
 title: "KYBBAHOLIC: The Americas Tour"
 city: Vancouver
-venue: "Fortune Sound Club"
+venue: Fortune Sound Club
 date: 2026-10-02
-ticket_link: "https://kybba.world"
+image: /img/kybba-oct-2.png
+ticket_link: https://kybba.world
 sold_out: false
 ---
 
