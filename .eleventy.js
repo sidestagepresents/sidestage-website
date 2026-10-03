@@ -12,7 +12,12 @@ module.exports = function (eleventyConfig) {
     const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
     return m ? `${m[1]}-${m[2]}-${m[3]}` : s;
   };
-  const todayStr = () => new Date().toISOString().slice(0, 10);
+  // "Today" in Toronto time, so tonight's show doesn't vanish at 8pm ET (midnight UTC)
+  const todayStr = () => {
+    const now = new Date();
+    const toronto = new Date(now.getTime() + torontoOffsetMinutes(now) * 60000);
+    return toronto.toISOString().slice(0, 10);
+  };
 
   eleventyConfig.addFilter("isoDate", isoDate);
   eleventyConfig.addFilter("year", (v) => isoDate(v).slice(0, 4));
