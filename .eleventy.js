@@ -71,6 +71,7 @@ module.exports = function (eleventyConfig) {
   });
 
   const byDateDesc = (a, b) => (isoDate(a.data.date) < isoDate(b.data.date) ? 1 : -1);
+  const byDateAsc = (a, b) => (isoDate(a.data.date) < isoDate(b.data.date) ? -1 : 1);
 
   eleventyConfig.addCollection("allEvents", (c) =>
     notDraft(c.getFilteredByGlob("src/events/*.md")).sort(byDateDesc)
@@ -79,7 +80,7 @@ module.exports = function (eleventyConfig) {
     const t = todayStr();
     return notDraft(c.getFilteredByGlob("src/events/*.md"))
       .filter((e) => isoDate(e.data.date) >= t)
-      .sort(byDateDesc);
+      .sort(byDateAsc);
   });
   eleventyConfig.addCollection("pastEvents", (c) => {
     const t = todayStr();
