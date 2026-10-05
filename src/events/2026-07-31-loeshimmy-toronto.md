@@ -1,10 +1,10 @@
 ---
-artist: "Loeshimmy"
+artist: Loeshimmy
 title: ""
 city: Toronto
-venue: "The Opera House"
+venue: The Opera House
 date: 2026-07-31
-sold_out: false
+sold_out: true
 ---
 
 <!-- source: @sidestagepresents Instagram | confidence: high -->
