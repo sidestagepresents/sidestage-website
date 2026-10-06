@@ -1,0 +1,363 @@
+# Sidestage: scheduled publish + social slots
+#
+# WHAT IT DOES
+#   Every 15 minutes (scheduled, mode=send):
+#     1. Lifts expired `publish_at` embargoes -> event goes live on the site
+#     2. Sends due social posts (announcement / on sale / day of show / custom)
+#        via Buffer, honoring each slot's toggle, image, and schedule.
+#   Manually (Actions -> Run workflow -> mode=populate):
+#     Writes the three standard slots (announcement, on sale, day of show)
+#     into upcoming/draft events that lack them, pre-rendered from the global
+#     templates, and commits. Run it after saving a draft, then edit the
+#     pre-filled text/toggles/images in /admin. Re-running refreshes any slot
+#     you haven't customized; your edits are never overwritten.
+#
+# TEXT RESOLUTION (per slot): explicit slot text in the event file wins;
+# otherwise the global template (Site Settings -> Social post templates) is
+# rendered with [ARTIST] [TITLE] [VENUE] [CITY] [DATE] [ON_SALE]
+# [TICKET_DOMAIN] [TICKET_LINK].
+#
+# IMAGE RULE (locked): a slot NEVER posts without an image. Slot image wins,
+# else the event flyer. Imageless slots are HELD and logged every run.
+#
+# BUFFER SETUP (one time): repo Settings > Secrets and variables > Actions:
+#     BUFFER_API_TOKEN, BUFFER_CHANNEL_IDS (comma-separated channel IDs)
+
+name: Scheduled publish + social
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "send = post due slots; populate = write missing social slots into event files"
+        required: false
+        default: "send"
+        type: choice
+        options: [send, populate]
+      event_file:
+        description: "Populate only this file (e.g. src/events/2026-10-20-artist-city.md). Blank = all upcoming."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish + social slots
+        env:
+          BUFFER_API_TOKEN: ${{ secrets.BUFFER_API_TOKEN }}
+          BUFFER_CHANNEL_IDS: ${{ secrets.BUFFER_CHANNEL_IDS }}
+          RUN_MODE: ${{ inputs.mode || 'send' }}
+          EVENT_FILE: ${{ inputs.event_file }}
+        run: |
+          python3 - <<'PYEOF'
+          import glob, json, os, re, urllib.parse, urllib.request
+          from datetime import datetime, date as date_cls, time as time_cls
+          from zoneinfo import ZoneInfo
+
+          try:
+              import yaml
+          except ImportError:
+              os.system("pip install -q pyyaml")
+              import yaml
+
+          TORONTO = ZoneInfo("America/Toronto")
+          SITE_URL = "https://sidestagepresents.com"
+          BUFFER_API = "https://api.buffer.com"
+          STATE_PATH = ".github/buffer-state.json"
+          TEMPLATES_PATH = "src/_data/social_templates.json"
+
+          FALLBACK_TEMPLATES = {
+              "announcement": "JUST ANNOUNCED! [ARTIST] at [VENUE] - [DATE] | ON SALE [ON_SALE] AT [TICKET_DOMAIN]",
+              "on_sale": "ON SALE NOW! [ARTIST] at [VENUE] - [DATE] | TICKETS AT [TICKET_DOMAIN]",
+              "day_of_show": "TONIGHT! [ARTIST] at [VENUE], [CITY] | LAST CHANCE AT [TICKET_DOMAIN]",
+          }
+          try:
+              templates = {**FALLBACK_TEMPLATES, **json.load(open(TEMPLATES_PATH))}
+          except (FileNotFoundError, json.JSONDecodeError):
+              templates = FALLBACK_TEMPLATES
+
+          now = datetime.now(TORONTO).replace(microsecond=0)
+          today = now.date()
+          mode = os.environ.get("RUN_MODE", "send").strip() or "send"
+          only_file = os.environ.get("EVENT_FILE", "").strip()
+          print(f"Mode: {mode}")
+
+          try:
+              state = json.load(open(STATE_PATH))
+          except (FileNotFoundError, json.JSONDecodeError):
+              state = {}
+          for _p, _s in state.items():  # migrate v1 keys
+              if "announced" in _s and "announcement" not in _s:
+                  _s["announcement"] = _s.pop("announced")
+              if "onsale" in _s and "on_sale" not in _s:
+                  _s["on_sale"] = _s.pop("onsale")
+
+          def s(v):
+              if v is None:
+                  return ""
+              if isinstance(v, bool):
+                  return "true" if v else "false"
+              return str(v).strip()
+
+          def parse_dt(v):
+              if v is None or s(v) == "":
+                  return None
+              if isinstance(v, datetime):
+                  t = v
+              elif isinstance(v, date_cls):
+                  t = datetime.combine(v, time_cls(0, 0))
+              else:
+                  try:
+                      t = datetime.fromisoformat(s(v))
+                  except ValueError:
+                      return None
+              return t if t.tzinfo else t.replace(tzinfo=TORONTO)
+
+          def fmt_date(d):
+              t = parse_dt(d)
+              return t.strftime("%a, %b %-d, %Y").upper() if t else ""
+
+          def fmt_onsale(v):
+              t = parse_dt(v)
+              return t.strftime("%b %-d, %-I%p").upper() if t else "TBA"
+
+          def ticket_domain(link):
+              net = urllib.parse.urlparse(s(link)).netloc.lower()
+              return net[4:] if net.startswith("www.") else net
+
+          def render(template, data):
+              ctx = {
+                  "ARTIST": s(data.get("artist")),
+                  "TITLE": s(data.get("title")),
+                  "VENUE": s(data.get("venue")),
+                  "CITY": s(data.get("city")),
+                  "DATE": fmt_date(data.get("date")),
+                  "ON_SALE": fmt_onsale(data.get("onsale_at")),
+                  "TICKET_DOMAIN": ticket_domain(data.get("ticket_link")),
+                  "TICKET_LINK": s(data.get("ticket_link")),
+              }
+              out = s(template)
+              for k, v in ctx.items():
+                  out = out.replace(f"[{k}]", v)
+              return re.sub(r"\s+", " ", out).strip()
+
+          def event_date(data):
+              t = parse_dt(data.get("date"))
+              return t.date() if t else None
+
+          def default_send_at(slot, data):
+              if slot == "announcement":
+                  return parse_dt(data.get("publish_at")) or now
+              if slot == "on_sale":
+                  return parse_dt(data.get("onsale_at"))
+              if slot == "day_of_show":
+                  d = event_date(data)
+                  return datetime.combine(d, time_cls(10, 0), TORONTO) if d else None
+              return None
+
+          STANDARD_SLOTS = ["announcement", "on_sale", "day_of_show"]
+
+          def explicit_slots(data):
+              items = data.get("social_posts") or []
+              return {s(x.get("slot")): x for x in items
+                      if isinstance(x, dict) and s(x.get("slot"))}
+
+          def as_bool(v, default=True):
+              if v is None:
+                  return default
+              return str(v).lower() not in ("false", "no", "0")
+
+          def resolve_slots(data):
+              exp = explicit_slots(data)
+              out = []
+              for slot in STANDARD_SLOTS + [k for k in exp if k not in STANDARD_SLOTS]:
+                  e = exp.get(slot, {})
+                  send_at = parse_dt(e.get("send_at")) if e else None
+                  if not send_at and slot in STANDARD_SLOTS:
+                      send_at = default_send_at(slot, data)
+                  text = s(e.get("text")) if e else ""
+                  if not text and slot in templates:
+                      text = render(templates[slot], data)
+                  out.append({
+                      "slot": slot,
+                      "send_at": send_at,
+                      "text": text,
+                      "image": s(e.get("image")) if e else "",
+                      "enabled": as_bool(e.get("enabled")) if e else True,
+                  })
+              return out
+
+          def read_event(path):
+              text = open(path, encoding="utf-8").read()
+              m = re.match(r"^---\n(.*?)\n---\n?", text, re.S)
+              if not m:
+                  return None, text
+              try:
+                  return yaml.safe_load(m.group(1)) or {}, text
+              except yaml.YAMLError as ex:
+                  print(f"WARN: skipping {path} (bad front matter): {ex}")
+                  return None, text
+
+          def write_event(path, text, data):
+              m = re.match(r"^---\n(.*?)\n---\n?", text, re.S)
+              fm = yaml.safe_dump(data, sort_keys=False, allow_unicode=True).strip()
+              open(path, "w", encoding="utf-8").write(
+                  text[:m.start(1)] + fm + text[m.end(1):])
+
+          token = os.environ.get("BUFFER_API_TOKEN", "").strip()
+          channels = [c.strip() for c in os.environ.get("BUFFER_CHANNEL_IDS", "").split(",") if c.strip()]
+          buffer_on = bool(token and channels)
+          if not buffer_on:
+              print("Buffer: skipped (set BUFFER_API_TOKEN and BUFFER_CHANNEL_IDS secrets to enable)")
+
+          MUTATION = """mutation CreatePost($input: CreatePostInput!) {
+            createPost(input: $input) {
+              ... on PostActionSuccess { post { id } }
+              ... on UnexpectedError { message }
+              ... on LimitReachedError { message }
+              ... on InvalidInputError { message }
+            }
+          }"""
+
+          def buffer_post(text, image_url=None):
+              ok = True
+              for ch in channels:
+                  inp = {"text": text[:280], "channelId": ch,
+                         "schedulingType": "automatic", "mode": "shareNow"}
+                  if image_url:
+                      inp["assets"] = {"images": [{"url": image_url}]}
+                  req = urllib.request.Request(
+                      BUFFER_API,
+                      data=json.dumps({"query": MUTATION, "variables": {"input": inp}}).encode(),
+                      headers={"Authorization": f"Bearer {token}",
+                               "Content-Type": "application/json"},
+                      method="POST")
+                  try:
+                      resp = json.load(urllib.request.urlopen(req, timeout=30))
+                  except Exception as ex:
+                      print(f"Buffer: channel {ch} request failed: {ex}")
+                      ok = False
+                      continue
+                  res = (resp.get("data") or {}).get("createPost") or {}
+                  if "post" not in res:
+                      print(f"Buffer: channel {ch} not queued: {res}")
+                      ok = False
+                  else:
+                      print(f"Buffer: queued post {res['post'].get('id')} on channel {ch}")
+              return ok
+
+          changed = False
+          files = sorted(glob.glob("src/events/*.md"))
+          if only_file:
+              files = [only_file] if os.path.exists(only_file) else []
+              if not files:
+                  print(f"Populate: file not found: {only_file}")
+
+          for path in files:
+              data, text = read_event(path)
+              if data is None:
+                  continue
+              st = state.get(path, {})
+              draft = str(data.get("draft")).lower() == "true"
+              ed = event_date(data)
+
+              if mode == "populate":
+                  if ed and ed < today:
+                      continue  # archive stays untouched
+                  exp = explicit_slots(data)
+                  posts = list(data.get("social_posts") or [])
+                  touched = False
+                  for slot in STANDARD_SLOTS:
+                      fresh_text = render(templates[slot], data)
+                      fresh_send = default_send_at(slot, data)
+                      e = exp.get(slot)
+                      if e is None:
+                          posts.append({
+                              "slot": slot,
+                              "send_at": fresh_send.isoformat() if fresh_send else None,
+                              "text": fresh_text,
+                              "image": None,
+                              "enabled": True,
+                          })
+                          touched = True
+                      else:
+                          # refresh only slots Biz hasn't customized, and only
+                          # when something actually changes (keeps populate idempotent)
+                          if not s(e.get("text")):
+                              e["text"] = fresh_text
+                              touched = True
+                          cur_send = parse_dt(e.get("send_at"))
+                          if not cur_send and fresh_send:
+                              e["send_at"] = fresh_send.isoformat()
+                              touched = True
+                  if touched:
+                      data["social_posts"] = posts
+                      write_event(path, text, data)
+                      print(f"Populated: {path}")
+                      changed = True
+                  continue
+
+              # ---- send mode ----
+              if draft:
+                  state[path] = st
+                  continue
+
+              # lift expired embargo (site visibility; the announcement slot posts separately)
+              pub = parse_dt(data.get("publish_at"))
+              if pub and pub <= now:
+                  del data["publish_at"]
+                  write_event(path, text, data)
+                  text = open(path, encoding="utf-8").read()
+                  data, _ = read_event(path)
+                  print(f"Published: {path}")
+                  changed = True
+
+              if ed and ed < today:
+                  state[path] = st
+                  continue  # no social for past shows
+
+              for slot in resolve_slots(data):
+                  if not slot["enabled"]:
+                      continue
+                  if not slot["send_at"] or slot["send_at"] > now:
+                      continue
+                  if st.get(slot["slot"]):
+                      continue
+                  img = slot["image"] or s(data.get("image"))
+                  if not img:
+                      print(f"HOLD (no image, not posted): {path} [{slot['slot']}]")
+                      continue
+                  if not buffer_on:
+                      continue
+                  if buffer_post(slot["text"], SITE_URL + img):
+                      st[slot["slot"]] = now.isoformat()
+                      changed = True
+
+              state[path] = st
+
+          if changed or any(state.values()):
+              os.makedirs(".github", exist_ok=True)
+              json.dump(state, open(STATE_PATH, "w"), indent=2)
+          print("Done.")
+          PYEOF
+
+      - name: Commit and push
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "sidestage-publisher"
+            git config user.email "publisher@sidestagepresents.com"
+            git add -A
+            git commit -m "Scheduled publish: embargoes, social slots, buffer state"
+            git pull --rebase origin ${{ github.ref_name }}
+            git push origin ${{ github.ref_name }}
+          else
+            echo "No changes."
+          fi
