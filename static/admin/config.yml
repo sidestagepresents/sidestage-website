@@ -58,6 +58,41 @@ collections:
         widget: "datetime"
         required: false
         hint: "Optional: auto-post 'on sale now' to socials at this time (Toronto time). Needs the Buffer connection."
+      - label: "Social posts"
+        name: "social_posts"
+        widget: "list"
+        required: false
+        summary: "{{slot}} · {{send_at}}"
+        hint: "Announcement / on-sale / day-of-show slots. Run Populate (Actions tab) to pre-fill them from the global templates — slots you customize are never overwritten. To re-render a slot after changing event details, clear its Text field and re-run Populate. Toggle any post off to skip it — posts default to ON."
+        fields:
+          - label: "Slot"
+            name: "slot"
+            widget: "select"
+            options:
+              - { label: "Announcement", value: "announcement" }
+              - { label: "On sale", value: "on_sale" }
+              - { label: "Day of show", value: "day_of_show" }
+              - { label: "Custom", value: "custom" }
+            default: "custom"
+          - label: "Send at"
+            name: "send_at"
+            widget: "datetime"
+            required: false
+            hint: "Toronto time. Defaults: announcement → publish date, on sale → on-sale date, day of show → event date 10am."
+          - label: "Text"
+            name: "text"
+            widget: "text"
+            required: false
+            hint: "Leave blank to use the global template for this slot."
+          - label: "Image"
+            name: "image"
+            widget: "image"
+            required: false
+            hint: "Optional — defaults to the event flyer. A post never goes out without an image."
+          - label: "Post this"
+            name: "enabled"
+            widget: "boolean"
+            default: true
       - { label: "Flyer image", name: "image", widget: "image", required: false }
       - { label: "Ticket link", name: "ticket_link", widget: "string", required: false }
       - { label: "Sold out", name: "sold_out", widget: "boolean", default: false }
@@ -102,3 +137,19 @@ collections:
           - { label: "CTA button", name: "show_cta", widget: "boolean", default: false, hint: "Shows a call-to-action button in the menu" }
           - { label: "CTA text", name: "cta_text", widget: "string", required: false, hint: "e.g. Get Tickets" }
           - { label: "CTA link", name: "cta_url", widget: "string", required: false }
+      - label: "Social post templates"
+        name: "social_templates"
+        file: "src/_data/social_templates.json"
+        fields:
+          - label: "Announcement template"
+            name: "announcement"
+            widget: "text"
+            hint: "Tokens: [ARTIST] [TITLE] [VENUE] [CITY] [DATE] [ON_SALE] [TICKET_DOMAIN] [TICKET_LINK]"
+          - label: "On sale template"
+            name: "on_sale"
+            widget: "text"
+            hint: "Tokens: [ARTIST] [TITLE] [VENUE] [CITY] [DATE] [ON_SALE] [TICKET_DOMAIN] [TICKET_LINK]"
+          - label: "Day of show template"
+            name: "day_of_show"
+            widget: "text"
+            hint: "Tokens: [ARTIST] [TITLE] [VENUE] [CITY] [DATE] [ON_SALE] [TICKET_DOMAIN] [TICKET_LINK]"
