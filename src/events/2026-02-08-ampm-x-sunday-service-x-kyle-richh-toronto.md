@@ -5,6 +5,7 @@ city: Toronto
 venue: "AMPM"
 date: 2026-02-08
 ticket_link: "https://www.eventbrite.com/e/ampm-x-sunday-service-x-kyle-richh-tickets-1981908909901"
+image: "/img/events/sqsp-6983a558.jpg"
 sold_out: false
 ---
 

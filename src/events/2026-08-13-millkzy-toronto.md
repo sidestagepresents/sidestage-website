@@ -1,10 +1,10 @@
 ---
-artist: Millkzy
+artist: "Millkzy"
 title: ""
 city: Toronto
-venue: The Drake Hotel
+venue: "The Drake Hotel"
 date: 2026-08-13
-image: /img/milkzy.png
+image: "/img/events/millkzy-tour-2026.jpg"
 sold_out: false
 ---
 

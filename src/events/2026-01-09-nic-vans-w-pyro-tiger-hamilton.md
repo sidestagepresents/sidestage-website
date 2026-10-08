@@ -5,6 +5,7 @@ city: Hamilton
 venue: "Club 77"
 date: 2026-01-09
 ticket_link: "https://www.bouncelife.com/events/6938ef767cc1768516f597e2"
+image: "/img/events/sqsp-6952883a.jpg"
 sold_out: false
 ---
 

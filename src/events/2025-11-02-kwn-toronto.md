@@ -5,6 +5,7 @@ city: Toronto
 venue: "The Mod Club"
 date: 2025-11-02
 ticket_link: "https://www.ticketmaster.ca/event/100062D304EB5650"
+image: "/img/events/sqsp-68596648.jpg"
 sold_out: false
 ---
 

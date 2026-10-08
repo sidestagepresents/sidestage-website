@@ -5,6 +5,7 @@ city: Toronto
 venue: "DPRTMNT"
 date: 2026-01-10
 ticket_link: "https://www.ticketweb.ca/event/nic-vans-dprtmnt-tickets/13987244"
+image: "/img/events/sqsp-695288c4.jpg"
 sold_out: false
 ---
 

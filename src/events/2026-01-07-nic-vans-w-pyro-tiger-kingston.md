@@ -5,6 +5,7 @@ city: Kingston
 venue: "Stages"
 date: 2026-01-07
 ticket_link: "https://www.eventbrite.ca/e/nic-vans-love-island-live-in-kingston-tickets-1977480266710?aff=ebdssbdestsearch"
+image: "/img/events/sqsp-69528778.jpg"
 sold_out: false
 ---
 

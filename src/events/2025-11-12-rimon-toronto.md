@@ -5,6 +5,7 @@ city: Toronto
 venue: "Adelaide Hall"
 date: 2025-11-12
 ticket_link: "https://admitone.com/events/rimon-toronto-10054127"
+image: "/img/events/sqsp-68403c60.jpg"
 sold_out: false
 ---
 

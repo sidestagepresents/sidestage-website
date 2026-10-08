@@ -5,6 +5,7 @@ city: Toronto
 venue: "Drake Underground"
 date: 2025-10-05
 ticket_link: "https://www.ticketmaster.ca/event/100062EEDBF8AF4D"
+image: "/img/events/sqsp-68766ba9.jpg"
 sold_out: false
 ---
 

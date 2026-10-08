@@ -5,6 +5,7 @@ city: Montreal
 venue: "New City Gas"
 date: 2026-02-24
 ticket_link: "https://www.ticketmaster.ca/event/1000638FB7A37C1C"
+image: "/img/events/sqsp-69442ed0.jpg"
 sold_out: false
 ---
 

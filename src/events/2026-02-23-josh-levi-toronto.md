@@ -5,6 +5,7 @@ city: Toronto
 venue: "The Drake Underground"
 date: 2026-02-23
 ticket_link: "https://www.universe.com/events/rimon-tickets-ZS59MD"
+image: "/img/events/sqsp-693adcde.jpg"
 sold_out: false
 ---
 

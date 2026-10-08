@@ -5,6 +5,7 @@ city: Winnipeg
 venue: "Red River Exhibition Park"
 date: 2026-08-29
 ticket_link: "https://tixr.com"
+image: "/img/events/summer-rap-2026.jpg"
 sold_out: false
 ---
 

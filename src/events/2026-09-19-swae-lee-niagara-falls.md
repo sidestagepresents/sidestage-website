@@ -4,6 +4,7 @@ title: ""
 city: Niagara Falls
 venue: "The Sundowner"
 date: 2026-09-19
+image: "/img/events/swae-lee-press-2026.jpg"
 sold_out: false
 ---
 

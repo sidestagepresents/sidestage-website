@@ -5,6 +5,7 @@ city: Montreal
 venue: "Bar Le Ritz PDB"
 date: 2025-11-13
 ticket_link: "https://www.universe.com/events/rimon-tickets-ZS59MD"
+image: "/img/events/sqsp-684040fd.jpg"
 sold_out: false
 ---
 

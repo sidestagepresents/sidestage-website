@@ -5,6 +5,7 @@ city: Calgary
 venue: "Bleu Dayclub"
 date: 2026-07-09
 ticket_link: "https://bleucalgary.ca"
+image: "/img/events/freddie-gibbs-calgary-2026.jpg"
 sold_out: false
 ---
 

@@ -4,6 +4,7 @@ title: ""
 city: Toronto
 venue: "The Drake Underground"
 date: 2026-04-03
+image: "/img/events/sqsp-69442f2f.jpg"
 sold_out: true
 ---
 

@@ -5,6 +5,7 @@ city: Toronto
 venue: "Longboat Hall"
 date: 2026-03-06
 ticket_link: "https://www.ticketmaster.ca/jesse-baez-toronto-ontario-03-06-2026/event/10006348BD43CEC6"
+image: "/img/events/jesse-baez-2026.jpg"
 sold_out: false
 ---
 

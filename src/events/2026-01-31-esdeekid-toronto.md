@@ -5,6 +5,7 @@ city: Toronto
 venue: "The Mod Club"
 date: 2026-01-31
 ticket_link: "/home"
+image: "/img/events/sqsp-697cc741.jpg"
 sold_out: true
 ---
 

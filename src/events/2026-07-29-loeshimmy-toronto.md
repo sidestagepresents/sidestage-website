@@ -4,6 +4,7 @@ title: ""
 city: Toronto
 venue: ""
 date: 2026-07-29
+image: "/img/events/loeshimmy-2026.jpg"
 sold_out: true
 ---
 

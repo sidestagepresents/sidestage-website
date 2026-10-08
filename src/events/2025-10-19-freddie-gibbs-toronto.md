@@ -5,6 +5,7 @@ city: Toronto
 venue: "HISTORY"
 date: 2025-10-19
 ticket_link: "https://www.ticketmaster.ca/event/10006303B27C34F0"
+image: "/img/events/sqsp-68921426.jpg"
 sold_out: false
 ---
 

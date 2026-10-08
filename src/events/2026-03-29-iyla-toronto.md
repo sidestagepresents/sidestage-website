@@ -5,6 +5,7 @@ city: Toronto
 venue: "The Drake Underground"
 date: 2026-03-29
 ticket_link: "https://www.ticketmaster.ca/event/1000643CF9EDAB65"
+image: "/img/events/sqsp-697cc517.jpg"
 sold_out: false
 ---
 
