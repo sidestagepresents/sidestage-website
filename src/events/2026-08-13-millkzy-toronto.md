@@ -1,9 +1,10 @@
 ---
-artist: "Millkzy"
+artist: Millkzy
 title: ""
 city: Toronto
-venue: "The Drake Hotel"
+venue: The Drake Hotel
 date: 2026-08-13
+image: /img/milkzy.png
 sold_out: false
 ---
 
