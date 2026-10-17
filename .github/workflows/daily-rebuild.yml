@@ -1,0 +1,23 @@
+name: Daily rebuild
+
+# The site is static: the homepage only drops past shows when a new build
+# deploys, and Cloudflare Pages only builds on pushes to main. This keeps
+# the site fresh without anyone having to publish an update by hand.
+on:
+  schedule:
+    - cron: "0 11 * * *" # ~7am ET: yesterday's shows drop off
+  workflow_dispatch: # manual "Run workflow" button in the Actions tab
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Empty commit to trigger a Cloudflare Pages rebuild
+        run: |
+          git config user.name "Sidestage rebuild bot"
+          git config user.email "bot@sidestagepresents.com"
+          git commit --allow-empty -m "chore: daily rebuild (drop past shows)"
+          git push
