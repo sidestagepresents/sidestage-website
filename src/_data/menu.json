@@ -7,5 +7,6 @@
   "show_cta": false,
   "show_instagram": true,
   "cta_text": "",
-  "show_upcoming": true
+  "show_upcoming": true,
+  "show_contests": true
 }

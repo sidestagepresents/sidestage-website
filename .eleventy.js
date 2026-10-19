@@ -78,12 +78,22 @@ module.exports = function (eleventyConfig) {
   const byDateDesc = (a, b) => (isoDate(a.data.date) < isoDate(b.data.date) ? 1 : -1);
   const byDateAsc = (a, b) => (isoDate(a.data.date) < isoDate(b.data.date) ? -1 : 1);
 
-  // Append default UTM tags to outbound ticket links (skips params already set)
+  // Append default UTM tags to outbound ticket links (skips params already set).
+  // utm_source comes from the site's own domain in settings, so each
+  // installation attributes its outbound clicks to itself.
+  const utmSource = (() => {
+    try {
+      const siteUrl = require("./src/_data/settings.json").site_url || "";
+      return new URL(siteUrl).hostname.replace(/^www\./, "");
+    } catch {
+      return "";
+    }
+  })();
   const addUtm = (url) => {
     if (!url) return url;
     try {
       const u = new URL(url);
-      if (!u.searchParams.has("utm_source")) u.searchParams.set("utm_source", "sidestagepresents.com");
+      if (utmSource && !u.searchParams.has("utm_source")) u.searchParams.set("utm_source", utmSource);
       if (!u.searchParams.has("utm_medium")) u.searchParams.set("utm_medium", "referral");
       return u.toString();
     } catch {
@@ -173,6 +183,14 @@ module.exports = function (eleventyConfig) {
       (a.data.name || "").localeCompare(b.data.name || "")
     )
   );
+  // Contests: entries with an offsite enter link. Shown while not expired
+  // (Toronto time); the contest itself runs elsewhere.
+  eleventyConfig.addCollection("activeContests", (c) => {
+    const t = todayStr();
+    return notDraft(c.getFilteredByGlob("src/contests/*.md"))
+      .filter((e) => isoDate(e.data.expiry) >= t)
+      .sort((a, b) => (isoDate(a.data.expiry) < isoDate(b.data.expiry) ? -1 : 1));
+  });
 
   return {
     dir: { input: "src", output: "_site", includes: "_includes" },

@@ -1,0 +1,22 @@
+---
+layout: layouts/base.njk
+title: Contests
+---
+<h1>Contests</h1>
+{% for c in collections.activeContests %}
+<article class="event{% if not c.data.image %} no-img{% endif %}">
+  {% if c.data.image %}
+  <div class="event-img">{% eventImage c.data.image, c.data.title + " contest image" %}</div>
+  {% endif %}
+  <div class="event-body">
+    <h2>{{ c.data.title }}</h2>
+    {% if c.data.expiry %}<p class="meta">Ends {{ c.data.expiry | readableDate }}</p>{% endif %}
+    {% if c.templateContent %}<div class="contest-desc">{{ c.templateContent | safe }}</div>{% endif %}
+    <p class="actions">
+      {% if c.data.enter_link %}<a class="btn" href="{{ c.data.enter_link | utm }}" target="_blank" rel="noopener">Enter</a>{% endif %}
+    </p>
+  </div>
+</article>
+{% else %}
+<p>No running contests right now. Check back soon.</p>
+{% endfor %}
