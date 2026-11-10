@@ -1,7 +1,7 @@
 ---
 artist: BABYFXCE E
 title: ""
-city: "Toronto "
+city: "Montreal "
 venue: Theatre Fairmount
 date: 2027-02-25
 publish_at: 2026-10-21T12:00:00-04:00
